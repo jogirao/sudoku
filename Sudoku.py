@@ -9,6 +9,7 @@ import SudokuSolver as Ss
 import SudokuGUI
 from sqlitedict import SqliteDict
 from tkinter import Tk
+import os.path
 
 
 class Sudoku:
@@ -108,10 +109,12 @@ class Sudoku:
 
     def login_user(self, user_name: str) -> str:
         # Initialize user account with files from DB
-        with open("Users.txt", "r") as f:
-            for line in f:
-                if line == user_name:
-                    return user_name    # User exists
+        path = "./Users.txt"
+        if os.path.isfile(path):
+            with open("Users.txt", "r") as f:
+                for line in f:
+                    if line == user_name:
+                        return user_name    # User exists
         self.create_new_user(user_name)
         with open("Users.txt", "a") as f:
             f.write(user_name)
