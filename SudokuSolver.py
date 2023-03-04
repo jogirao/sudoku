@@ -11,17 +11,17 @@ from random import randint
 
 class SudokuSolver:
     
-    def __init__(self, sdk):
+    def __init__(self, puzzle):
         # Initialize solver
-        self.sudoku = sdk
-        self.possibleNumbersForCell = {}
+        self.sudoku = puzzle
+        self.cell_number_options = {}
         self.rowSets = {}
         self.cellsByRow = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: []}
         self.colSets = {}
         self.cellsByCol = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: []}
         self.sqrSets = {}
         self.cellsBySqr = {0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: []}
-        self.emptyCells = []
+        self.empty_cells = []
         self.States = []
         self.order = int(len(self.sudoku.state)**0.5)
     
@@ -31,7 +31,7 @@ class SudokuSolver:
             if len(nbs) > 0:
                 if (i, cell[1]) != cell:
                     try:
-                        nums = deepcopy(self.possibleNumbersForCell[i, (cell[1])])
+                        nums = deepcopy(self.cell_number_options[i, (cell[1])])
                     except:
                         nums = set()
                     nbs -= nums
@@ -45,7 +45,7 @@ class SudokuSolver:
             if len(nbs) > 0:
                 if (cell[0], i) != cell:
                     try:
-                        nums = deepcopy(self.possibleNumbersForCell[(cell[0], i)])
+                        nums = deepcopy(self.cell_number_options[(cell[0], i)])
                     except:
                         nums = set()
                     nbs -= nums
@@ -55,17 +55,14 @@ class SudokuSolver:
     
     def check_box(self, nbs, cell):
         # Checks if any number in the set is unique in the box that contains it
-        side_length = int(len(self.sudoku.state)**0.5)
-        R = int(cell[0] / side_length) * side_length
-        C = int(cell[1] / side_length) * side_length
-        for r in range(side_length):
-            row = R+r
-            for c in range(side_length):
-                col = C+c
+        box_size = int(len(self.sudoku.state)**0.5)
+        start_row, start_column = (cell[0] // box_size) * box_size, (cell[1] // box_size) * box_size
+        for row in range(start_row, start_row + box_size):
+            for column in range(start_column, start_column + box_size):
                 if len(nbs) > 0:
-                    if (row,col) != cell:
+                    if (row, column) != cell:
                         try:
-                            nums = deepcopy(self.possibleNumbersForCell[(row, col)])
+                            nums = deepcopy(self.cell_number_options[(row, column)])
                         except:
                             nums = set()
                         nbs -= nums
@@ -100,39 +97,75 @@ class SudokuSolver:
                     nbs = deepcopy(nums)
         return nbs
         
-    def fillCell(self, c, newEmptyCells):
+    def fillCell(self, c, new_empty_cells):
         # Only one number meets criteria
         # Fill cell
-        self.sudoku.state[c] = self.possibleNumbersForCell[c].pop()
-        del self.possibleNumbersForCell[c]
+        self.sudoku.state[c] = self.cell_number_options[c].pop()
+        del self.cell_number_options[c]
         # Update row/column/square info
         self.rowSets[c[0]].add(self.sudoku.state[c])
         self.colSets[c[1]].add(self.sudoku.state[c])
         self.sqrSets[(c[1]//self.order)+(self.order*(c[0]//self.order))].add(self.sudoku.state[c])
         # Remove cell from list of empty cells
-        newEmptyCells.remove(c)
+        new_empty_cells.remove(c)
         self.cellsByRow[c[0]].remove(c)
         self.cellsByCol[c[1]].remove(c)
         self.cellsBySqr[(c[1]//self.order)+(self.order*(c[0]//self.order))].remove(c)
         
-    def getCellInfo(self):
+    def get_cell_number_options(self):
         # Get information about the sudoku cells' states
-        l = len(self.sudoku.state)
-        numList = set(range(1, l+1))
+        side_length = len(self.sudoku.state)
+        numbers = set(range(1, side_length + 1))
         # Fill list for each cell
-        for r in range(l):
-            for c in range(l):
+        for r in range(side_length):
+            for c in range(side_length):
                 if self.sudoku.state[r, c] == 0:
-                    # Update lists of cells by row/column/square
-                    self.cellsByRow[r].append((r, c))
-                    self.cellsByCol[c].append((r, c))
-                    self.cellsBySqr[(c//self.order)+(self.order*(r//self.order))].append((r, c))
                     # Get list of possible numbers for the cell
-                    self.possibleNumbersForCell[r, c] = numList - self.rowSets[r] - self.colSets[c] - \
-                        self.sqrSets[(c // self.order) + (self.order * (r // self.order))]
+                    row_numbers = self.get_numbers_in_row(r)
+                    column_numbers = self.get_numbers_in_column(c)
+                    box_numbers = self.get_numbers_in_box(r, c, int(side_length ** 0.5))
+                    self.cell_number_options[(r, c)] = numbers - row_numbers - column_numbers - box_numbers
                     # Update set of empty cells
-                    self.emptyCells.append((r, c))
-                    
+                    self.empty_cells.append((r, c))
+                else:
+                    self.cell_number_options[(r, c)] = set()
+
+    def get_numbers_in_box(self, row: int, column: int, box_length: int):
+        # Get the numbers of the filled cells in the current box
+        start_row, start_column = row // box_length * box_length, column // box_length * box_length
+        number_set = set()
+        for r in range(row, row + box_length):
+            for c in range(column, column + box_length):
+                if self.sudoku.state[r, c] != 0:
+                    number_set.add(self.sudoku.state[r, c])
+        return number_set
+
+    def get_numbers_in_column(self, column: int):
+        # Get the numbers of the filled cells in the current box
+        number_set = set()
+        for r in range(len(self.sudoku.state)):
+            if self.sudoku.state[r, column] != 0:
+                number_set.add(self.sudoku.state[r, column])
+        return number_set
+
+    def get_numbers_in_row(self, row: int):
+        # Get the numbers of the filled cells in the current box
+        number_set = set()
+        for c in range(len(self.sudoku.state)):
+            if self.sudoku.state[row, c] != 0:
+                number_set.add(self.sudoku.state[row, c])
+        return number_set
+
+    def get_preemptive_sets(self):
+        # Find the preemptive sets in the sudoku puzzle
+        for size in range(self.order+1, 1, -1):
+            for row in range(9):
+                self.preemptive_set(size, self.cellsByRow[row])
+            for col in range(9):
+                self.preemptive_set(size, self.cellsByCol[col])
+            for sqr in range(9):
+                self.preemptive_set(size, self.cellsBySqr[sqr])
+
     def getSets(self):
         # Get the list of numbers in the rows, columns and squares of the puzzle
         l = len(self.sudoku.state)
@@ -177,16 +210,6 @@ class SudokuSolver:
         else:
             out = base
         return out, flg
-        
-    def get_preemptive_sets(self):
-        # Find the preemptive sets in the sudoku puzzle
-        for size in range(self.order+1, 1, -1):
-            for row in range(9):
-                self.preemptive_set(size, self.cellsByRow[row])
-            for col in range(9):
-                self.preemptive_set(size, self.cellsByCol[col])
-            for sqr in range(9):
-                self.preemptive_set(size, self.cellsBySqr[sqr])
                 
     def preemptive_set(self, size, group):
         # Computes preemptive sets
@@ -199,7 +222,7 @@ class SudokuSolver:
             nums = set()
             for cell in Set:
                 # join_sets
-                nums, ps_flg = self.join_sets(nums, self.possibleNumbersForCell[cell], size)
+                nums, ps_flg = self.join_sets(nums, self.cell_number_options[cell], size)
                 # Exit if there are too many numbers for the preemptive set
                 if ps_flg < 0:
                     break
@@ -218,44 +241,44 @@ class SudokuSolver:
         lgt = 1
         while found == 0:
             lgt += 1
-            for cell in self.possibleNumbersForCell:
-                if len(self.possibleNumbersForCell[cell]) == lgt:
+            for cell in self.cell_number_options:
+                if len(self.cell_number_options[cell]) == lgt:
                     found = 1
                     break
-        Set = list(self.possibleNumbersForCell[cell])
+        Set = list(self.cell_number_options[cell])
         num = Set[randint(0, len(Set)-1)]
         return cell, num
     
-    def randomGuess(self, emptyCells):
+    def randomGuess(self, empty_cells):
         # Choose random number to proceed with sudoku solution
         cell, num = self.randomChoice()
         # Save current state
-        State = [deepcopy(self.sudoku), deepcopy(self.possibleNumbersForCell), deepcopy(self.rowSets),
+        State = [deepcopy(self.sudoku), deepcopy(self.cell_number_options), deepcopy(self.rowSets),
                  deepcopy(self.cellsByRow), deepcopy(self.colSets), deepcopy(self.cellsByCol),
-                 deepcopy(self.sqrSets), deepcopy(self.cellsBySqr), deepcopy(self.emptyCells),
+                 deepcopy(self.sqrSets), deepcopy(self.cellsBySqr), deepcopy(self.empty_cells),
                  cell, num]
         # Update state list
         self.States.append(State)
-        self.possibleNumbersForCell[cell] = {num}
-        self.fillCell(cell, emptyCells)
+        self.cell_number_options[cell] = {num}
+        self.fillCell(cell, empty_cells)
     
     def reduceList(self, c, lastClue, looped):
         # More than one possibility found, reduce list of possible numbers
-        newList = self.possibleNumbersForCell[c] - self.rowSets[c[0]] - self.colSets[c[1]] - \
+        newList = self.cell_number_options[c] - self.rowSets[c[0]] - self.colSets[c[1]] - \
                   self.sqrSets[(c[1] // self.order) + (self.order * (c[0] // self.order))]
-        if newList != self.possibleNumbersForCell[c]:
+        if newList != self.cell_number_options[c]:
             # Update last cell that got closer to a solution
             lastClue = c
-            self.possibleNumbersForCell[c] = newList
-            looped = 0
+            self.cell_number_options[c] = newList
+            looped = False
         else:
             # Deploy additional techniques to reduce list of possible numbers
-            newList = self.check_for_unique_number(deepcopy(self.possibleNumbersForCell[c]), c)
-            if newList != self.possibleNumbersForCell[c]:
+            newList = self.check_for_unique_number(deepcopy(self.cell_number_options[c]), c)
+            if newList != self.cell_number_options[c]:
                 # Update last cell that got closer to a solution
                 lastClue = c
-                self.possibleNumbersForCell[c] = newList
-                looped = 0
+                self.cell_number_options[c] = newList
+                looped = False
         return lastClue, looped
     
     def revertGuess(self):
@@ -266,86 +289,78 @@ class SudokuSolver:
             State = self.States.pop(-1)
         # Update state
         self.sudoku = State[0]
-        self.possibleNumbersForCell = State[1]
+        self.cell_number_options = State[1]
         self.rowSets = State[2]
         self.cellsByRow = State[3]
         self.colSets = State[4]
         self.cellsByCol = State[5]
         self.sqrSets = State[6]
         self.cellsBySqr = State[7]
-        self.emptyCells = State[8]
+        self.empty_cells = State[8]
         # Remove chosen number from list of possibilities
-        self.possibleNumbersForCell[State[9]].remove(State[10])
+        self.cell_number_options[State[9]].remove(State[10])
         
     def solve(self):
         # Solve sudoku puzzle
         # Initialize auxiliary informative variables
         self.getSets()
-        self.getCellInfo()
-        clue=(-1,-1)
+        self.get_cell_number_options()
+        clue = (-1, -1)
         # While sudoku isn't solved
-        cnt=0
-        looped = 0
-        while len(self.emptyCells) != 0:
+        counter = 0
+        looped = False
+        while len(self.empty_cells) != 0:
             # New loop
-            newEmptyCells = deepcopy(self.emptyCells)
-            cnt += 1
-
-            if cnt == 500:
+            new_empty_cells = self.empty_cells.copy()
+            counter += 1
+            if counter == 500:
                 print("Counter full!")
-                print(self.possibleNumbersForCell)
+                print(self.cell_number_options)
                 break
-            reverted = 0
+            reverted = False
             # For each empty cell
-            for cell in self.emptyCells:
+            for cell in self.empty_cells:
                 # Check list of possible numbers
-                try:
-                    self.possibleNumbersForCell[cell]
-                except:
+                if not self.cell_number_options[cell]:
                     # Impossible state, return to previous set
                     self.revertGuess()
-                    reverted = 1
-                    break
-                if len(self.possibleNumbersForCell[cell]) == 0:
-                    # Impossible state, return to previous set
-                    self.revertGuess()
+                    reverted = True
                     clue, looped = self.reduceList(cell, clue, looped)
-                    reverted = 1
                     break
-                elif len(self.possibleNumbersForCell[cell]) == 1:
-                    self.fillCell(cell, newEmptyCells)
+                elif len(self.cell_number_options[cell]) == 1:
+                    self.fillCell(cell, new_empty_cells)
                 else:
                     clue, looped = self.reduceList(cell, clue, looped)
                     # Recheck list of possible numbers
                     try:
-                        self.possibleNumbersForCell[cell]
+                        self.cell_number_options[cell]
                     except:
                         # Impossible state, return to previous set
                         self.revertGuess()
                         clue, looped = self.reduceList(cell, clue, looped)
-                        reverted = 1
+                        reverted = True
                         break
-                    if len(self.possibleNumbersForCell[cell]) == 0:
+                    if len(self.cell_number_options[cell]) == 0:
                         # Impossible state, return to previous set
                         self.revertGuess()
-                        reverted = 1
+                        reverted = True
                         break
-                    elif len(self.possibleNumbersForCell[cell]) == 1:
-                        self.fillCell(cell, newEmptyCells)
-                    elif looped == 1 and (cell == clue or clue not in self.emptyCells):
+                    elif len(self.cell_number_options[cell]) == 1:
+                        self.fillCell(cell, new_empty_cells)
+                    elif looped and (cell == clue or clue not in self.empty_cells):
                         # Resort to preemptive set search
-                        prevCellNbs = deepcopy(self.possibleNumbersForCell)
+                        prevCellNbs = deepcopy(self.cell_number_options)
                         self.get_preemptive_sets()
-                        if prevCellNbs == self.possibleNumbersForCell:
+                        if prevCellNbs == self.cell_number_options:
                             # Resort to random guessing
-                            self.randomGuess(newEmptyCells)
+                            self.randomGuess(new_empty_cells)
                             break
                         else:
-                            looped = 0
+                            looped = False
                 # print(self.sudoku.__str__())
-            if reverted == 0:
-                self.emptyCells = newEmptyCells
-            looped = 1
+            if not reverted:
+                self.empty_cells = new_empty_cells.copy()
+            looped = True
         return self.sudoku.state
 
     def updateCells(self, preemptive_set, cells, group):
@@ -354,6 +369,6 @@ class SudokuSolver:
         for cell in group:
             if cell not in cells:
                 # Cell does not belong to preemptive set
-                self.possibleNumbersForCell[cell] -= preemptive_set
+                self.cell_number_options[cell] -= preemptive_set
                 out.append(cell)
         return out
