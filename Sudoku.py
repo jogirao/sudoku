@@ -23,7 +23,7 @@ class Sudoku:
         self.state = np.copy(self.start_state)
         # Chosen sudoku's solution
         self.solution = np.array(self.get_from_db(user_name + ".sqlite", "solutions", puzzle_number))
-        self.run_ui()
+        # self.run_ui()
             
     def __str__(self, sdk=()):
         # String representation of the sudoku state
@@ -67,29 +67,34 @@ class Sudoku:
     def check_solution(self) -> bool:
         # Check solution's correctness
         if np.all(self.state == self.solution):
-            print("You are correct!")
             return True
         return False
+
+    def compute_solution(self) -> int:
+        # Computes solution to given sudoku
+        solver = Ss.SudokuSolver(self)
+        solution = solver.solve()
+        if not solution:
+            return -1
+        return self.save_to_db(self.user + ".sqlite", "solutions", solution)
 
     def create_new_user(self, user_name: str) -> None:
         # Add new user to DB
         db_name = user_name + ".sqlite"
         self.import_default_files(db_name)
 
-    def draw_sudoku(self) -> None:
+    def draw_sudoku(self, solved=False) -> None:
         # Prints a legible form of sudoku to console
-        print(Sudoku.__str__(self))
+        if solved:
+            print(Sudoku.__str__(self.solution))
+        else:
+            print(Sudoku.__str__(self))
 
     @staticmethod
     def get_from_db(db_name: str, table_name: str, sudoku_number: int) -> tuple:
         # Retrieve specified data from selected DB
         with SqliteDict(db_name, tablename=table_name, autocommit=True) as db:
             return db[table_name].get(sudoku_number, None)
-
-    def get_solution(self, sudoku: np.array) -> np.array:
-        # Computes solution to given sudoku
-        solution = Ss.SudokuSolver(sudoku).solve()
-        self.save_to_db(self.user + ".sqlite", "solutions", solution)
 
     @staticmethod
     def import_data(db_name: str, file_name: str, table_name: str) -> None:
@@ -120,9 +125,24 @@ class Sudoku:
             f.write(user_name)
         return user_name
 
+    def new_puzzle(self, board: np.array) -> None:
+        # Get new puzzle
+        self.start_state = board
+        self.state = np.copy(self.start_state)
+        solved_flg = self.compute_solution()
+        if solved_flg == -1:
+            print("WARNING: Could not compute solution to the puzzle! \n\t\tPlease check the board's validity.")
+            self.start_state = np.array(self.get_from_db(self.user + ".sqlite", "puzzles", self.sudoku_id))
+            self.state = np.copy(self.start_state)
+        else:
+            puzzle_number = self.save_to_db(self.user + ".sqlite", "puzzles", board)
+            self.reset_sudoku()
+            self.sudoku_id = puzzle_number
+
     def reset_sudoku(self) -> None:
         # Reset game state
         self.state = np.copy(self.start_state)
+        self.game_over = False
 
     def run_ui(self):
         # Start the Sudoku UI
@@ -131,20 +151,10 @@ class Sudoku:
         root.mainloop()
 
     @staticmethod
-    def save_to_db(db_name: str, table_name: str, sudoku: tuple) -> None:
+    def save_to_db(db_name: str, table_name: str, sudoku: tuple) -> int:
         # Save given sudoku state to selected DB
         with SqliteDict(db_name, tablename=table_name, autocommit=True) as db:
             temp_dict = db[table_name]
             temp_dict.update({len(db[table_name]) + 1: tuple(map(tuple, sudoku))})
             db[table_name] = temp_dict
-
-    def set_cell_value(self, row: int, col: int, num: int) -> None:
-        # Set the value of desired cell
-        if row > len(self.state) or col > len(self.state):
-            print('Please insert a valid number')
-        elif self.state[row, col] == 0:
-            print("You can't change one of the base numbers.")
-        else:
-            self.state[row, col] = num
-
-    
+        return len(db[table_name]) + 1

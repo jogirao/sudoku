@@ -250,7 +250,7 @@ class SudokuSolver:
             counter += 1
             if counter == 5000:
                 # print("Counter full!\n", self.cell_number_options)
-                break
+                return []
             # For each empty cell
             for cell in self.empty_cells:
                 # Check list of possible numbers
