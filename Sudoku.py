@@ -25,16 +25,17 @@ class Sudoku:
         self.solution = np.array(self.get_from_db(user_name + ".sqlite", "solutions", puzzle_number))
         # self.run_ui()
             
-    def __str__(self, sdk=()):
+    def __str__(self, solved=False):
         # String representation of the sudoku state
-        if len(sdk) == 0:
+        if solved:
+            sdk = self.solution
+        else:
             sdk = self.state
-        length = len(sdk)
-        sudoku_size = int(length**0.5)
+        length, size = len(sdk), int(len(sdk)**0.5)
         string = ''
         # Horizontal separator
         line = ''
-        for i in range(length*3-sudoku_size+1):
+        for i in range(length * 3 - size + 1):
             line += '-'
         line += '\n'
         string += line
@@ -46,12 +47,12 @@ class Sudoku:
                     string += ' '
                 else:
                     string += str(sdk[r, c])
-                if (c+1) % sudoku_size == 0:
+                if (c + 1) % size == 0:
                     string += '|'
                 else:
                     string += '  '
             string += '\n'
-            if (r+1) % sudoku_size == 0:
+            if (r + 1) % size == 0:
                 string += line
         return string
 
@@ -74,7 +75,7 @@ class Sudoku:
         # Computes solution to given sudoku
         solver = Ss.SudokuSolver(self)
         solution = solver.solve()
-        if not solution:
+        if len(solution) == 0:
             return -1
         return self.save_to_db(self.user + ".sqlite", "solutions", solution)
 
@@ -85,10 +86,7 @@ class Sudoku:
 
     def draw_sudoku(self, solved=False) -> None:
         # Prints a legible form of sudoku to console
-        if solved:
-            print(Sudoku.__str__(self.solution))
-        else:
-            print(Sudoku.__str__(self))
+        print(Sudoku.__str__(self, solved=solved))
 
     @staticmethod
     def get_from_db(db_name: str, table_name: str, sudoku_number: int) -> tuple:
@@ -155,6 +153,7 @@ class Sudoku:
         # Save given sudoku state to selected DB
         with SqliteDict(db_name, tablename=table_name, autocommit=True) as db:
             temp_dict = db[table_name]
-            temp_dict.update({len(db[table_name]) + 1: tuple(map(tuple, sudoku))})
+            new_id = len(db[table_name]) + 1
+            temp_dict.update({new_id: tuple(map(tuple, sudoku))})
             db[table_name] = temp_dict
-        return len(db[table_name]) + 1
+        return new_id
