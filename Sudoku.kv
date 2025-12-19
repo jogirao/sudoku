@@ -7,8 +7,8 @@ MainWidget:
 
 <MainBoxLayout>:
     orientation: "vertical"
-    spacing: "10dp"
-    padding: "10dp"
+    spacing: 0
+    padding: 0
     canvas.before:
         Color:
             rgba: (.95, .95, .95, 1)
@@ -16,12 +16,12 @@ MainWidget:
             size: self.size
             pos: self.pos
     UpperBoxLayout:
-        size_hint: 1, None
-        height: "60dp"
+        size_hint_y: None
+        height: "64dp"
     BoxLayout:
         orientation: "vertical"
-        size_hint: 1, 1
-        spacing: "10dp"
+        spacing: "8dp"
+        padding: "10dp", "10dp", "10dp", "10dp"
         SudokuGridLayout:
             size_hint: 1, 0.6
         NumPadLayout:
@@ -29,28 +29,58 @@ MainWidget:
 
 <UpperBoxLayout>:
     orientation: "horizontal"
-    size_hint: 1, None
-    height: "60dp"
-    padding: "5dp"
+    spacing: "12dp"
+    padding: "12dp", "8dp", "12dp", "8dp"
     canvas.before:
         Color:
-            rgba: (.5, .8, 1, 1)
+            rgba: (.45, .75, 1, 1)
         Rectangle:
             size: self.size
             pos: self.pos
+        # Subtle shadow effect
+        Color:
+            rgba: (0, 0, 0, 0.1)
+        Rectangle:
+            pos: self.x, self.y - 2
+            size: self.width, 2
     Button:
-        text: "≡"
-        font_size: "30sp"
-        background_color: (1, 1, 1, .25) if self.state == "normal" else (1, 1, 1, .15)
+        text: ""
+        background_color: 0, 0, 0, 0
         size_hint: None, 1
-        width: "60dp"
+        width: "48dp"
         on_press: root.parent.parent.manager.current = "menu"
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 0.15) if self.state == "normal" else (1, 1, 1, 0.25)
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [8]
+        canvas.after:
+            Color:
+                rgba: (1, 1, 1, 0.9) if self.state == "normal" else (1, 1, 1, 1)
+            # Top line
+            Rectangle:
+                pos: self.x + self.width * 0.25, self.center_y + 8
+                size: self.width * 0.5, 2
+            # Middle line
+            Rectangle:
+                pos: self.x + self.width * 0.25, self.center_y
+                size: self.width * 0.5, 2
+            # Bottom line
+            Rectangle:
+                pos: self.x + self.width * 0.25, self.center_y - 8
+                size: self.width * 0.5, 2
     Label:
         text: "Sudoku Puzzle"
-        font_size: "20sp"
+        font_size: "22sp"
         bold: True
         color: (1, 1, 1, 1)
         size_hint: 1, 1
+        halign: "left"
+        valign: "center"
+        text_size: self.size
+        padding: "8dp", "0dp"
 
 <Cell>:
     background_color: 0, 0, 0, 0
@@ -102,12 +132,6 @@ MainWidget:
     orientation: "vertical"
     spacing: "8dp"
     padding: "10dp"
-    canvas.before:
-        Color:
-            rgba: (.95, .95, .95, 1)
-        Rectangle:
-            size: self.size
-            pos: self.pos
     GridLayout:
         id: numbers_grid
         cols: 3
@@ -166,12 +190,6 @@ MainWidget:
 
 <SudokuGridLayout>:
     padding: "10dp"
-    canvas.before:
-        Color:
-            rgba: (.95, .95, .95, 1)
-        Rectangle:
-            size: self.size
-            pos: self.pos
     BoxLayout:
         size_hint: None, None
         size: min(root.width - 20, root.height - 20), min(root.width - 20, root.height - 20)
