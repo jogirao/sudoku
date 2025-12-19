@@ -19,8 +19,8 @@ class Sudoku:
         self.game_over = False
         self.sudoku_id = puzzle_number
         # Chosen sudoku's state
-        self.start_state = np.array(self.get_from_db(user_name + ".sqlite", "puzzles", puzzle_number))
-        self.state = np.copy(self.start_state)
+        self.initial_state = np.array(self.get_from_db(user_name + ".sqlite", "puzzles", puzzle_number))
+        self.state = np.copy(self.initial_state)
         # Chosen sudoku's solution
         self.solution = np.array(self.get_from_db(user_name + ".sqlite", "solutions", puzzle_number))
         # self.run_ui()
@@ -56,19 +56,14 @@ class Sudoku:
         return string
 
     def change_sudoku(self, num: int) -> None:
-        # Choose another sudoku
-        # Chosen sudoku
+        # Switch to another puzzle in the database
         self.sudoku_id = num
-        # Chosen sudoku's state
         self.state = np.array(self.get_from_db(self.user + ".sqlite", "puzzles", self.sudoku_id))
-        # Chosen sudoku's solution
         self.solution = np.array(self.get_from_db(self.user + ".sqlite", "solutions", self.sudoku_id))
         
     def check_solution(self) -> bool:
         # Check solution's correctness
-        if np.all(self.state == self.solution):
-            return True
-        return False
+        return np.all(self.state == self.solution)
 
     def compute_solution(self) -> int:
         # Computes solution to given sudoku
@@ -127,13 +122,13 @@ class Sudoku:
 
     def new_puzzle(self, board: np.array) -> None:
         # Get new puzzle
-        self.start_state = board
-        self.state = np.copy(self.start_state)
+        self.initial_state = board
+        self.state = np.copy(self.initial_state)
         solved_flg = self.compute_solution()
         if solved_flg == -1:
-            print("WARNING: Could not compute solution to the puzzle! \n\t\tPlease check the board's validity.")
-            self.start_state = np.array(self.get_from_db(self.user + ".sqlite", "puzzles", self.sudoku_id))
-            self.state = np.copy(self.start_state)
+            print("WARNING: Could not compute solution to the puzzle!\n\t\tPlease check the board's validity.")
+            self.initial_state = np.array(self.get_from_db(self.user + ".sqlite", "puzzles", self.sudoku_id))
+            self.state = np.copy(self.initial_state)
         else:
             puzzle_number = self.save_to_db(self.user + ".sqlite", "puzzles", board)
             self.reset_sudoku()
@@ -141,7 +136,7 @@ class Sudoku:
 
     def reset_sudoku(self) -> None:
         # Reset game state
-        self.state = np.copy(self.start_state)
+        self.state = np.copy(self.initial_state)
         self.game_over = False
 
     def run_ui(self):
