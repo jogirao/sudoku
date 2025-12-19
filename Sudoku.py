@@ -6,10 +6,17 @@ Created on Thu Nov 19 22:44:58 2020
 """
 import numpy as np
 import SudokuSolver as Ss
-import SudokuGUI
 from sqlitedict import SqliteDict
-from tkinter import Tk
 import os.path
+import ast
+
+# Try to import tkinter-based GUI (optional)
+try:
+    import SudokuGUI
+    from tkinter import Tk
+    TKINTER_AVAILABLE = True
+except ImportError:
+    TKINTER_AVAILABLE = False
 
 
 class Sudoku:
@@ -98,7 +105,7 @@ class Sudoku:
         with open(file_name, "r") as f:
             for line in f:
                 args = line.split(": ")
-                temp_dict.update({eval(args[0]): eval(args[1])})
+                temp_dict.update({ast.literal_eval(args[0]): ast.literal_eval(args[1])})
         with SqliteDict(db_name, tablename=table_name, autocommit=True) as db:
             db[table_name] = temp_dict
 
@@ -141,6 +148,11 @@ class Sudoku:
 
     def run_ui(self):
         # Start the Sudoku UI
+        if not TKINTER_AVAILABLE:
+            raise ImportError(
+                "Tkinter is not available. Please use the Kivy-based GUI (Main.py) instead, "
+                "or install Python with tkinter support."
+            )
         root = Tk()
         SudokuGUI.SudokuUI(root, self)
         root.mainloop()

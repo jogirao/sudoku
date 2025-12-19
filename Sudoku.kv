@@ -7,17 +7,31 @@ MainWidget:
 
 <MainBoxLayout>:
     orientation: "vertical"
+    spacing: "10dp"
+    padding: "10dp"
     canvas.before:
         Color:
             rgba: (.95, .95, .95, 1)
         Rectangle:
             size: self.size
             pos: self.pos
+    UpperBoxLayout:
+        size_hint: 1, None
+        height: "60dp"
+    BoxLayout:
+        orientation: "vertical"
+        size_hint: 1, 1
+        spacing: "10dp"
+        SudokuGridLayout:
+            size_hint: 1, 0.6
+        NumPadLayout:
+            size_hint: 1, 0.4
 
 <UpperBoxLayout>:
-    orientation: "vertical"
-    size_hint: 1, .12
-    #height: 32
+    orientation: "horizontal"
+    size_hint: 1, None
+    height: "60dp"
+    padding: "5dp"
     canvas.before:
         Color:
             rgba: (.5, .8, 1, 1)
@@ -25,13 +39,18 @@ MainWidget:
             size: self.size
             pos: self.pos
     Button:
+        text: "≡"
+        font_size: "30sp"
         background_color: (1, 1, 1, .25) if self.state == "normal" else (1, 1, 1, .15)
-        background_normal: "images/burger_icon.webp"
-        background_down: "images/burger_icon.webp"
-        pos_hint: {"x": 0.01}
-        size_hint: (0.15, .9)
-        #size: "64dp", "64dp"
+        size_hint: None, 1
+        width: "60dp"
         on_press: root.parent.parent.manager.current = "menu"
+    Label:
+        text: "Sudoku Puzzle"
+        font_size: "20sp"
+        bold: True
+        color: (1, 1, 1, 1)
+        size_hint: 1, 1
 
 <Cell>:
     background_color: 0, 0, 0, 0
@@ -46,91 +65,87 @@ MainWidget:
             size: self.size
             pos: self.pos
 
-<NumPadCornerButton1>:
-    background_color: 0, 0, 0, 0
-    background_normal: ''
-    bold: "True"
-    font_size: self.size[0] * .6
-    color: (.4, .4, .4, 1)
-    canvas.before:
-        Color:
-            rgba: (.8, .8, .8, 1) if self.state == "normal" else (.5, .8, 1, 1)
-        RoundedRectangle:
-            size: self.size
-            pos: self.pos
-            radius: (6, 0, 0, 0)
-
-<NumPadCornerButton2>:
-    background_color: 0, 0, 0, 0
-    background_normal: ''
-    bold: "True"
-    font_size: self.size[0] * .6
-    color: (.4, .4, .4, 1)
-    canvas.before:
-        Color:
-            rgba: (.8, .8, .8, 1) if self.state == "normal" else (.5, .8, 1, 1)
-        RoundedRectangle:
-            size: self.size
-            pos: self.pos
-            radius: (0, 6, 0, 0)
-
-<NumPadCornerButton3>:
-    background_color: 0, 0, 0, 0
-    background_normal: ''
-    bold: "True"
-    font_size: self.size[0] * .3
-    color: (.4, .4, .4, 1)
-    canvas.before:
-        Color:
-            rgba: (.8, .8, .8, 1) if self.state == "normal" else (.5, .8, 1, 1)
-        RoundedRectangle:
-            size: self.size
-            pos: self.pos
-            radius: (0, 0, 0, 6)
-
-<NumPadCornerButton4>:
-    background_color: 0, 0, 0, 0
-    background_normal: ''
-    bold: "True"
-    font_size: self.size[0] * .3
-    color: (.4, .4, .4, 1)
-    canvas.before:
-        Color:
-            rgba: (.8, .8, .8, 1) if self.state == "normal" else (.5, .8, 1, 1)
-        RoundedRectangle:
-            size: self.size
-            pos: self.pos
-            radius: (0, 0, 6, 0)
-
 <NumPadButton>:
     background_color: 0, 0, 0, 0
     background_normal: ''
-    bold: "True"
-    font_size: self.size[0] * .6
-    color: (.4, .4, .4, 1)
+    bold: True
+    font_size: min(self.width, self.height) * 0.5
+    color: (0.3, 0.3, 0.3, 1)
     canvas.before:
         Color:
-            rgba: (.8, .8, .8, 1) if self.state == "normal" else (.5, .8, 1, 1)
-        Rectangle:
+            rgba: (1, 1, 1, 1) if self.state == "normal" else (.5, .8, 1, 1)
+        RoundedRectangle:
             size: self.size
             pos: self.pos
+            radius: [8]
+        Color:
+            rgba: (0.85, 0.85, 0.85, 1) if self.state == "normal" else (.4, .7, .95, 1)
+        Line:
+            rounded_rectangle: (self.x, self.y, self.width, self.height, 8)
+            width: 1.5
+
+<NumPadControlButton>:
+    background_color: 0, 0, 0, 0
+    background_normal: ''
+    bold: True
+    font_size: "18sp"
+    color: (1, 1, 1, 1)
+    canvas.before:
+        Color:
+            rgba: (0.9, 0.4, 0.4, 1) if self.state == "normal" else (0.95, 0.5, 0.5, 1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [8]
 
 <NumPadLayout>:
-    size_hint: None, None
-    size: "220dp", "280dp"
-    pos_hint: {"center_x": .53}
-    padding: [16]
-    spacing: [6, 6]
+    orientation: "vertical"
+    spacing: "8dp"
+    padding: "10dp"
     canvas.before:
         Color:
             rgba: (.95, .95, .95, 1)
         Rectangle:
             size: self.size
             pos: self.pos
+    GridLayout:
+        id: numbers_grid
+        cols: 3
+        rows: 3
+        spacing: "6dp"
+        size_hint: 1, 1
+        padding: 0
+        NumPadButton:
+            text: "1"
+        NumPadButton:
+            text: "2"
+        NumPadButton:
+            text: "3"
+        NumPadButton:
+            text: "4"
+        NumPadButton:
+            text: "5"
+        NumPadButton:
+            text: "6"
+        NumPadButton:
+            text: "7"
+        NumPadButton:
+            text: "8"
+        NumPadButton:
+            text: "9"
+    BoxLayout:
+        orientation: "horizontal"
+        spacing: "8dp"
+        size_hint: 1, None
+        height: "50dp"
+        NumPadControlButton:
+            text: "Delete"
+        NumPadControlButton:
+            text: "Clear"
 
 <SudokuBox>:
     rows: 3
-    spacing: [4, 4]
+    spacing: "2dp"
     canvas.before:
         Color:
             rgba: (0.7, 0.7, 0.7, 1)
@@ -139,12 +154,9 @@ MainWidget:
             pos: self.pos
 
 <SudokuGrid>:
-    size_hint: .9, None
-    height: self.size[0]
-    pos_hint: {"center_x": .5, "center_y": .5}
     rows: 3
-    padding: [6]
-    spacing: [6, 6]
+    padding: "4dp"
+    spacing: "4dp"
     canvas.before:
         Color:
             rgba: (0, 0, 0, 1)
@@ -153,4 +165,16 @@ MainWidget:
             pos: self.pos
 
 <SudokuGridLayout>:
-    SudokuGrid
+    padding: "10dp"
+    canvas.before:
+        Color:
+            rgba: (.95, .95, .95, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    BoxLayout:
+        size_hint: None, None
+        size: min(root.width - 20, root.height - 20), min(root.width - 20, root.height - 20)
+        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+        SudokuGrid:
+            size_hint: 1, 1

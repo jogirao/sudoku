@@ -1,16 +1,14 @@
 from kivy.app import App
 from kivy.graphics import RoundedRectangle
 from kivy.lang import Builder
-from kivy.metrics import dp
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.relativelayout import RelativeLayout
-from kivy.uix.stacklayout import StackLayout
-# from kivy.uix.widget import Widget
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.screenmanager import ScreenManager, Screen
 from menu import MenuWidget
+import ast
 
 Builder.load_file("menu.kv")
 
@@ -23,22 +21,49 @@ class MainBoxLayout(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.selected_cell = None
-        ubl = UpperBoxLayout()
-        self.add_widget(ubl)
-        sgl = SudokuGridLayout()
-        self.add_widget(sgl)
-        for box in self.children[0].children[0].children:
-            for cell in box.children:
-                cell.bind(state=self.on_cell_click)
-        np = NumPadLayout()
-        self.add_widget(np)
-        for button in self.children[0].children:
-            if button.text == "Delete":
-                button.bind(on_press=self.on_delete_click)
-            elif button.text == "Clear":
-                button.bind(on_press=self.on_clear_click)
-            else:
-                button.bind(on_press=self.on_number_click)
+
+    def on_kv_post(self, base_widget):
+        """Called after the kv lang file has been applied to this widget"""
+        # Now that the .kv file has created all children, bind events
+
+        # Find and bind Sudoku Grid cells
+        for child in self.children:
+            if isinstance(child, SudokuGridLayout):
+                sudoku_grid = self._find_sudoku_grid(child)
+                if sudoku_grid:
+                    for box in sudoku_grid.children:
+                        for cell in box.children:
+                            cell.bind(state=self.on_cell_click)
+
+            # Find and bind NumPad buttons
+            elif isinstance(child, NumPadLayout):
+                self._bind_numpad_events(child)
+
+    def _find_sudoku_grid(self, widget):
+        """Recursively find the SudokuGrid widget in the layout tree"""
+        if isinstance(widget, SudokuGrid):
+            return widget
+        for child in widget.children:
+            result = self._find_sudoku_grid(child)
+            if result:
+                return result
+        return None
+
+    def _bind_numpad_events(self, numpad):
+        """Bind events to all NumPad buttons"""
+        for child in numpad.children:
+            # Check if it's the controls container
+            if isinstance(child, BoxLayout) and child.orientation == 'horizontal':
+                for button in child.children:
+                    if button.text == "Delete":
+                        button.bind(on_press=self.on_delete_click)
+                    elif button.text == "Clear":
+                        button.bind(on_press=self.on_clear_click)
+            # Check if it's the numbers grid
+            elif isinstance(child, GridLayout):
+                for button in child.children:
+                    if isinstance(button, NumPadButton):
+                        button.bind(on_press=self.on_number_click)
 
     def on_cell_click(self, widget, value):
         if widget.state == "down":
@@ -57,36 +82,24 @@ class MainBoxLayout(BoxLayout):
                 self.selected_cell.text = ""
 
     def on_clear_click(self, widget):
-        for box in self.children[1].children[0].children:
-            for cell in box.children:
-                if cell.color != [0, 0, 0, 1]:
-                    cell.text = ""
+        # Find the SudokuGridLayout (second child after UpperBoxLayout)
+        for child in self.children:
+            if isinstance(child, SudokuGridLayout):
+                sudoku_grid = self._find_sudoku_grid(child)
+                if sudoku_grid:
+                    for box in sudoku_grid.children:
+                        for cell in box.children:
+                            if cell.color != [0, 0, 0, 1]:
+                                cell.text = ""
+                break
 
 
 class UpperBoxLayout(BoxLayout):
     pass
 
 
-class NumPadLayout(StackLayout):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        BOX_WIDTH1 = 60
-        BOX_WIDTH2 = 91
-        BOX_HEIGHT = 60
-        for i in range(9):
-            if i == 0:
-                b = NumPadCornerButton1(text=str(i + 1), size_hint=(None, None), size=(dp(BOX_WIDTH1), dp(BOX_HEIGHT)), bold=True)
-                self.add_widget(b)
-            elif i == 2:
-                b = NumPadCornerButton2(text=str(i + 1), size_hint=(None, None), size=(dp(BOX_WIDTH1), dp(BOX_HEIGHT)), bold=True)
-                self.add_widget(b)
-            else:
-                b = NumPadButton(text=str(i+1), size_hint=(None, None), size=(dp(BOX_WIDTH1), dp(BOX_HEIGHT)), bold=True)
-                self.add_widget(b)
-        b = NumPadCornerButton3(text="Delete", size_hint=(None, None), size=(dp(BOX_WIDTH2), dp(BOX_HEIGHT)), bold=True)
-        self.add_widget(b)
-        b = NumPadCornerButton4(text="Clear", size_hint=(None, None), size=(dp(BOX_WIDTH2), dp(BOX_HEIGHT)), bold=True)
-        self.add_widget(b)
+class NumPadLayout(BoxLayout):
+    pass
 
 
 class SudokuBox(GridLayout):
@@ -105,19 +118,7 @@ class NumPadButton(Button):
     pass
 
 
-class NumPadCornerButton1(Button):
-    pass
-
-
-class NumPadCornerButton2(Button):
-    pass
-
-
-class NumPadCornerButton3(Button):
-    pass
-
-
-class NumPadCornerButton4(Button):
+class NumPadControlButton(Button):
     pass
 
 
@@ -132,7 +133,7 @@ class SudokuGrid(GridLayout):
             s = SudokuBox()
             self.add_widget(s)
         with open("Test_Sudoku.txt", "r") as f:
-            puzzle = eval(f.read())
+            puzzle = ast.literal_eval(f.read())
         i = 0
         for box in self.children:
             for cell in box.children:

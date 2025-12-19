@@ -6,17 +6,30 @@
         Rectangle:
             size: self.size
             pos: self.pos
-    Label:
-        text: "Sudoku App"
-        pos_hint: { "center_x": .5, "center_y": .6}
-    Button:
-        text: "Sudoku"
-        pos_hint: { "center_x": .5, "center_y": .4}
-        size_hint: .5, .05
-        canvas.before:
-	        Rectangle:
-	          #  color: (1, 0, 0, 1)
-	            size: self.size
-	            pos: self.pos
-	           # radius: (30, 15, 15, 15)
-        on_press: root.manager.current = "puzzle"
+    BoxLayout:
+        orientation: "vertical"
+        padding: "20dp"
+        spacing: "20dp"
+        Widget:
+            size_hint: 1, 0.3
+        Label:
+            text: "Sudoku App"
+            font_size: "32sp"
+            bold: True
+            color: (1, 1, 1, 1)
+            size_hint: 1, None
+            height: "50dp"
+        Widget:
+            size_hint: 1, 0.1
+        Button:
+            text: "Play Sudoku"
+            font_size: "20sp"
+            bold: True
+            size_hint: None, None
+            width: min(root.width * 0.6, 300)
+            height: "60dp"
+            pos_hint: {"center_x": 0.5}
+            background_color: (0.2, 0.6, 0.9, 1)
+            on_press: root.manager.current = "puzzle"
+        Widget:
+            size_hint: 1, 0.5
