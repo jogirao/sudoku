@@ -1,35 +1,143 @@
 
 <MenuWidget>:
     canvas.before:
+        # Primary background: white
         Color:
-            rgba: (.5, .8, 1, 1)
+            rgba: (1, 1, 1, 1)
         Rectangle:
             size: self.size
             pos: self.pos
+
     BoxLayout:
         orientation: "vertical"
-        padding: "20dp"
-        spacing: "20dp"
+        padding: "24dp"
+        spacing: "16dp"
+
         Widget:
-            size_hint: 1, 0.3
-        Label:
-            text: "Sudoku App"
-            font_size: "32sp"
-            bold: True
-            color: (1, 1, 1, 1)
-            size_hint: 1, None
-            height: "50dp"
+            size_hint: 1, 0.03
+
+        AnchorLayout:
+            size_hint_y: 0.62
+            anchor_x: 'center'
+            anchor_y: 'top'
+
+            BoxLayout:
+                size_hint: None, None
+                size: min(root.width * 0.82, dp(440)), min(root.height * 0.62, dp(440))
+                orientation: 'vertical'
+                spacing: '12dp'
+                padding: '12dp'
+                canvas.before:
+                    # Light-blue card background for a subtle accent
+                    Color:
+                        rgba: (0.97, 0.99, 1, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+
+                Image:
+                    id: puzzle_image
+                    source: 'D:\GitHub\sudoku\images\sudoku.png'
+                    size_hint: 1, 0.68
+                    allow_stretch: True
+                    keep_ratio: True
+
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: 0.32
+                    spacing: '10dp'
+                    padding: [0, '12dp', 0, 0]
+
+                    # small spacer to push buttons a little further down
+                    Widget:
+                        size_hint_y: None
+                        height: '6dp'
+
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: self.minimum_height
+                        padding: '24dp', 0
+
+                        Widget:
+                            size_hint_x: 1
+
+                        AnchorLayout:
+                            size_hint_x: None
+                            anchor_x: 'center'
+                            anchor_y: 'center'
+                            # width based on the widest button's text (texture width) + padding
+                            width: max(root.ids.play_btn.texture_size[0] if 'play_btn' in root.ids else 0, root.ids.camera_btn.texture_size[0] if 'camera_btn' in root.ids else 0, root.ids.library_btn.texture_size[0] if 'library_btn' in root.ids else 0) + dp(48)
+
+                            BoxLayout:
+                                orientation: 'vertical'
+                                size_hint: None, None
+                                width: self.parent.width
+                                height: self.minimum_height
+                                spacing: '10dp'
+
+                                Button:
+                                    id: play_btn
+                                    text: "Play Sudoku"
+                                    font_size: "22sp"
+                                    bold: True
+                                    background_normal: ''
+                                    background_color: (0, 0, 0, 0)
+                                    color: (1, 1, 1, 1)
+                                    size_hint: None, None
+                                    width: self.parent.width
+                                    height: "56dp"
+                                    on_press: root.manager.current = "puzzle"
+                                    canvas.before:
+                                        Color:
+                                            rgba: (0.2, 0.6, 0.9, 1)
+                                        RoundedRectangle:
+                                            pos: self.pos
+                                            size: self.size
+                                            radius: [12,]
+
+                                Button:
+                                    id: camera_btn
+                                    text: "📷  Camera"
+                                    font_size: "22sp"
+                                    bold: True
+                                    background_normal: ''
+                                    background_color: (0, 0, 0, 0)
+                                    color: (1, 1, 1, 1)
+                                    size_hint: None, None
+                                    width: self.parent.width
+                                    height: "48dp"
+                                    on_press: root.manager.current = "scanner"
+                                    canvas.before:
+                                        Color:
+                                            rgba: (0.2, 0.6, 0.9, 1)
+                                        RoundedRectangle:
+                                            pos: self.pos
+                                            size: self.size
+                                            radius: [10,]
+
+                                Button:
+                                    id: library_btn
+                                    text: "Puzzle library"
+                                    font_size: "22sp"
+                                    bold: True
+                                    background_normal: ''
+                                    background_color: (0, 0, 0, 0)
+                                    color: (1, 1, 1, 1)
+                                    size_hint: None, None
+                                    width: self.parent.width
+                                    height: "48dp"
+                                    on_press: root.manager.current = "library"
+                                    canvas.before:
+                                        Color:
+                                            rgba: (0.2, 0.6, 0.9, 1)
+                                        RoundedRectangle:
+                                            pos: self.pos
+                                            size: self.size
+                                            radius: [10,]
+
+                        Widget:
+                            size_hint_x: 1
+
         Widget:
-            size_hint: 1, 0.1
-        Button:
-            text: "Play Sudoku"
-            font_size: "20sp"
-            bold: True
-            size_hint: None, None
-            width: min(root.width * 0.6, 300)
-            height: "60dp"
-            pos_hint: {"center_x": 0.5}
-            background_color: (0.2, 0.6, 0.9, 1)
-            on_press: root.manager.current = "puzzle"
-        Widget:
-            size_hint: 1, 0.5
+            size_hint: 1, 0.05

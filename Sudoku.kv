@@ -61,16 +61,16 @@ MainWidget:
                 rgba: (1, 1, 1, 0.9) if self.state == "normal" else (1, 1, 1, 1)
             # Top line
             Rectangle:
-                pos: self.x + self.width * 0.25, self.center_y + 8
-                size: self.width * 0.5, 2
+                pos: self.x + self.width * 0.25, self.center_y + 10
+                size: self.width * 0.5, 4
             # Middle line
             Rectangle:
                 pos: self.x + self.width * 0.25, self.center_y
-                size: self.width * 0.5, 2
+                size: self.width * 0.5, 4
             # Bottom line
             Rectangle:
-                pos: self.x + self.width * 0.25, self.center_y - 8
-                size: self.width * 0.5, 2
+                pos: self.x + self.width * 0.25, self.center_y - 10
+                size: self.width * 0.5, 4
     Label:
         text: "Sudoku Puzzle"
         font_size: "22sp"
