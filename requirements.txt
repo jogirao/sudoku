@@ -10,3 +10,8 @@ pillow==10.4.0
 Pygments==2.19.2
 requests==2.32.5
 urllib3==2.6.2
+# Camera and image processing dependencies
+opencv-python==4.10.0.84
+tensorflow==2.18.0
+imutils==0.5.4
+scikit-image==0.24.0

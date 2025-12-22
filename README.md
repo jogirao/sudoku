@@ -100,3 +100,9 @@ python -m pytest tests/test_integration.py
 - Follow PEP 8 guidelines
 - Use docstrings for classes and functions
 - Keep imports organized (stdlib, third-party, local)
+
+### TODO
+1. Initialise camera and process sudoku
+2. Populate library with more examples and separate by difficulty
+3. Improve navigation between sudoku app pages
+4. Finish UI Layout of menu screen (links, remaining buttons)
