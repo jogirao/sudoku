@@ -40,7 +40,7 @@ sudoku/
 │       ├── test_library.py
 │       ├── test_library_manual.py
 │       └── test_refactor.py
-├── Main.py                    # Entry point (backwards compatible wrapper)
+├── main.py                    # Entry point
 ├── requirements.txt           # Python dependencies
 └── README.md                  # Project documentation
 ```
