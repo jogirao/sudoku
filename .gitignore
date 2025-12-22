@@ -1,0 +1,114 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.venv/
+env/
+ENV/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*,cover
+htmlcov/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff (if applicable)
+*.log
+local_settings.py
+db.sqlite3
+
+# Kivy
+# Kivy stores logs in user home, but add common patterns
+.kivy/
+.kivy/*
+
+# C extensions
+*.so
+*.pyd
+
+# PyInstaller
+#  Usually these files are written by a python script from a template
+*.manifest
+*.spec
+
+# Installer/packaging metadata
+*.egg-info/
+.installed.cfg
+
+# PyCharm/IDE
+.idea/
+*.iml
+.vscode/
+*.code-workspace
+
+# Editor temporary files
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Jupyter
+.ipynb_checkpoints
+
+# MyPy
+.mypy_cache/
+
+# Coverage reports
+coverage.xml
+
+# Local environment variables
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Node / frontend (if any)
+node_modules/
+
+# Misc
+*.bak
+*.tmp
+
+# Keep images, assets, puzzles and solutions tracked (explicitly allow)
+!images/
+!Puzzles.txt
+!Solutions.txt
+!Test_Sudoku.txt
+
+# If you ever add a venv inside other folders, ignore them as well
+**/venv/
+**/.venv/
