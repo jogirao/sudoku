@@ -61,23 +61,32 @@
         # Camera preview and controls
         BoxLayout:
             orientation: "vertical"
-            padding: "20dp"
-            spacing: "16dp"
+            padding: "20dp", "8dp", "20dp", "20dp"
+            spacing: "8dp"
 
-            # Camera view with overlay guide
+            # Camera view with overlay guide (takes all available space)
             RelativeLayout:
-                size_hint: 1, 0.65
+                size_hint: 1, 1
 
-                # Camera widget
+                # Camera widget - note: rotated -90deg (270deg) for portrait display
                 Camera:
                     id: camera
                     resolution: (640, 480)
                     play: False
                     allow_stretch: True
                     keep_ratio: True
+                    size_hint: 1, 1
+                    canvas.before:
+                        PushMatrix:
+                        Rotate:
+                            angle: -90
+                            origin: self.center
+                    canvas.after:
+                        PopMatrix:
 
                 # Overlay guide (helps user frame puzzle)
                 Widget:
+                    size_hint: 1, 1
                     canvas.after:
                         Color:
                             rgba: (1, 1, 1, 0.5)
@@ -100,59 +109,81 @@
                             points: [self.x + self.width * 0.9, self.y + self.height * 0.15, self.x + self.width * 0.9 - 20, self.y + self.height * 0.15, self.x + self.width * 0.9, self.y + self.height * 0.15, self.x + self.width * 0.9, self.y + self.height * 0.15 + 20]
                             width: 3
 
-            # Status and controls area
+            # Status label (shows feedback to user)
+            Label:
+                id: status_label
+                text: "Position puzzle in frame"
+                font_size: "14sp"
+                color: (1, 1, 1, 1)
+                size_hint: 1, None
+                height: "26dp"
+                halign: "center"
+                valign: "middle"
+                text_size: self.size
+
+            # Button container with auto-width
             BoxLayout:
-                orientation: "vertical"
-                size_hint: 1, 0.35
-                spacing: "12dp"
-                padding: "20dp", "10dp"
+                orientation: "horizontal"
+                size_hint: 1, None
+                height: dp(104)
 
-                # Status label (shows feedback to user)
-                Label:
-                    id: status_label
-                    text: "Position puzzle in frame"
-                    font_size: "16sp"
-                    color: (1, 1, 1, 1)
-                    size_hint: 1, None
-                    height: "60dp"
-                    halign: "center"
-                    valign: "middle"
-                    text_size: self.size
+                Widget:
+                    size_hint_x: 1
 
-                # Capture button
-                Button:
-                    id: capture_btn
-                    text: "Capture & Scan"
-                    font_size: "20sp"
-                    bold: True
-                    size_hint: 1, None
-                    height: "60dp"
-                    background_normal: ''
-                    background_color: (0, 0, 0, 0)
-                    color: (1, 1, 1, 1)
-                    on_press: root.capture_image()
-                    canvas.before:
-                        Color:
-                            rgba: (0.2, 0.6, 0.9, 1) if self.state == "normal" and not self.disabled else (0.5, 0.5, 0.5, 1)
-                        RoundedRectangle:
-                            size: self.size
-                            pos: self.pos
-                            radius: [12]
+                AnchorLayout:
+                    size_hint_x: None
+                    anchor_x: 'center'
+                    anchor_y: 'center'
+                    width: max(root.ids.capture_btn.texture_size[0] if 'capture_btn' in root.ids else 0, root.ids.back_btn.texture_size[0] if 'back_btn' in root.ids else 0) + dp(48)
 
-                # Back button
-                Button:
-                    text: "Back to Menu"
-                    font_size: "16sp"
-                    size_hint: 1, None
-                    height: "48dp"
-                    background_normal: ''
-                    background_color: (0, 0, 0, 0)
-                    color: (0.8, 0.8, 0.8, 1)
-                    on_press: root.manager.current = "menu"
-                    canvas.before:
-                        Color:
-                            rgba: (0.3, 0.3, 0.3, 1)
-                        RoundedRectangle:
-                            size: self.size
-                            pos: self.pos
-                            radius: [8]
+                    BoxLayout:
+                        orientation: 'vertical'
+                        size_hint: None, None
+                        width: self.parent.width
+                        height: self.parent.height
+                        spacing: '10dp'
+
+                        # Capture button
+                        Button:
+                            id: capture_btn
+                            text: "Capture & Scan"
+                            font_size: "20sp"
+                            bold: True
+                            size_hint: None, None
+                            width: self.parent.width
+                            height: "50dp"
+                            background_normal: ''
+                            background_color: (0, 0, 0, 0)
+                            color: (1, 1, 1, 1)
+                            on_press: root.capture_image()
+                            canvas.before:
+                                Color:
+                                    rgba: (0.2, 0.6, 0.9, 1) if self.state == "normal" and not self.disabled else (0.5, 0.5, 0.5, 1)
+                                RoundedRectangle:
+                                    size: self.size
+                                    pos: self.pos
+                                    radius: [12]
+
+                        # Back button
+                        Button:
+                            id: back_btn
+                            text: "Back to Menu"
+                            font_size: "20sp"
+                            bold: True
+                            size_hint: None, None
+                            width: self.parent.width
+                            height: "44dp"
+                            background_normal: ''
+                            background_color: (0, 0, 0, 0)
+                            color: (1, 1, 1, 1)
+                            on_press: root.manager.current = "menu"
+                            canvas.before:
+                                Color:
+                                    rgba: (0.2, 0.6, 0.9, 1)
+                                RoundedRectangle:
+                                    size: self.size
+                                    pos: self.pos
+                                    radius: [10]
+
+                Widget:
+                    size_hint_x: 1

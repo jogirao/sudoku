@@ -36,9 +36,20 @@ class SudokuGrid(GridLayout):
         # Load puzzle if file exists
         self.load_puzzle()
 
+    def clear_puzzle(self):
+        """Clear all cells in the puzzle"""
+        for box in self.children:
+            for cell in box.children:
+                cell.text = ""
+                cell.color = (0, 0, 0.8, 1)  # Reset to default color
+                cell.state = "normal"  # Reset toggle state
+
     def load_puzzle(self):
         """Load puzzle from file"""
         try:
+            # Clear existing puzzle first
+            self.clear_puzzle()
+
             with open(self.puzzle_file, "r") as f:
                 puzzle = ast.literal_eval(f.read())
 

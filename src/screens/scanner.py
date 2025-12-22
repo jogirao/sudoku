@@ -1,5 +1,6 @@
 """Scanner screen with camera functionality"""
 import os
+import cv2
 import numpy as np
 from kivy.uix.screenmanager import Screen
 from kivy.clock import Clock
@@ -17,6 +18,8 @@ class ScannerWidget(Screen):
         self.scanner = SudokuScanner()
         self.camera = None
         self.is_processing = False
+        # Desktop cameras often provide landscape feed, need rotation
+        self.needs_rotation = (platform not in ['android', 'ios'])
 
     def on_enter(self):
         """Initialize camera when screen is entered"""
@@ -143,6 +146,12 @@ class ScannerWidget(Screen):
 
         # Flip vertically (Kivy texture is upside down)
         arr = np.flip(arr, axis=0)
+
+        # On desktop, rotate image 90 degrees counter-clockwise to match display rotation
+        # Desktop webcams typically provide landscape (640x480) but we need portrait
+        # Display is rotated -90deg, so we rotate image -90deg (counter-clockwise) too
+        if self.needs_rotation:
+            arr = cv2.rotate(arr, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
         return arr.copy()
 
