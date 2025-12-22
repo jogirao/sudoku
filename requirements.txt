@@ -9,5 +9,4 @@ numpy==2.3.5
 pillow==10.4.0
 Pygments==2.19.2
 requests==2.32.5
-sqlitedict==2.1.0
 urllib3==2.6.2
