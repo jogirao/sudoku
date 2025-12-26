@@ -55,11 +55,22 @@ class MainBoxLayout(BoxLayout):
         """Handle selection from the lightbulb dropdown"""
         # Simple handler: log the selected option for now; implement actions later
         print(f"Hint selected: {option}")
-        if option == "Show Hints":
-            print("Show Hints selected (not implemented).")
+        if option == "Show Hint":
+            print("Show Hint selected (not implemented).")
         elif option == "Reveal Cell":
             print("Reveal Cell selected (not implemented).")
-        elif option == "Auto Solve Step":
-            print("Auto Solve Step selected (not implemented).")
-        elif option == "Toggle Notes":
-            print("Toggle Notes selected (not implemented).")
+        elif option == "Reveal Puzzle":
+            print("Reveal Puzzle selected (not implemented).")
+        elif option == "Check Puzzle":
+            print("Check Puzzle selected (not implemented).")
+
+    def on_gear_selected(self, option):
+        """Handle selection from the gear dropdown"""
+        # Simple handler: log the selected option for now; implement actions later
+        print(f"Gear selected: {option}")
+        if option == "New Puzzle":
+            print("New Puzzle selected (not implemented).")
+        elif option == "Toggle Lightmode":
+            print("Toggle Lightmode selected (not implemented).")
+        elif option == "Toggle Timer":
+            print("Toggle Timer selected (not implemented).")
