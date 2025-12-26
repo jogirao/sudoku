@@ -50,3 +50,16 @@ class MainBoxLayout(BoxLayout):
         for cell in self._find_all_cells(self):
             if cell.color != [0, 0, 0, 1]:  # Only clear non-fixed cells
                 cell.text = ""
+
+    def on_hint_selected(self, option):
+        """Handle selection from the lightbulb dropdown"""
+        # Simple handler: log the selected option for now; implement actions later
+        print(f"Hint selected: {option}")
+        if option == "Show Hints":
+            print("Show Hints selected (not implemented).")
+        elif option == "Reveal Cell":
+            print("Reveal Cell selected (not implemented).")
+        elif option == "Auto Solve Step":
+            print("Auto Solve Step selected (not implemented).")
+        elif option == "Toggle Notes":
+            print("Toggle Notes selected (not implemented).")

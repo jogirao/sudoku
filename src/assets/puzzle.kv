@@ -49,26 +49,20 @@ MainWidget:
         on_press: root.parent.parent.manager.current = "menu"
         canvas.before:
             Color:
-                rgba: (1, 1, 1, 0.15) if self.state == "normal" else (1, 1, 1, 0.25)
+                rgba: (1, 1, 1, 0) if self.state == "normal" else (1, 1, 1, 0.15)
             RoundedRectangle:
                 size: self.size
                 pos: self.pos
                 radius: [8]
-        canvas.after:
-            Color:
-                rgba: (1, 1, 1, 0.9) if self.state == "normal" else (1, 1, 1, 1)
-            # Top line
-            Rectangle:
-                pos: self.x + self.width * 0.25, self.center_y + 10
-                size: self.width * 0.5, 4
-            # Middle line
-            Rectangle:
-                pos: self.x + self.width * 0.25, self.center_y
-                size: self.width * 0.5, 4
-            # Bottom line
-            Rectangle:
-                pos: self.x + self.width * 0.25, self.center_y - 10
-                size: self.width * 0.5, 4
+        BoxLayout:
+            size: self.parent.size
+            pos: self.parent.pos
+            Image:
+                source: 'images/icons/arrow-pointing-left.png'
+                size_hint: .8, .8
+                pos_hint: {'center_y': .5}
+                fit_mode: 'contain'
+        
     Label:
         text: "Sudoku Puzzle"
         font_size: "22sp"
@@ -79,6 +73,153 @@ MainWidget:
         valign: "center"
         text_size: self.size
         padding: "8dp", "0dp"
+
+    # Right-side controls: three gear buttons (lightbulb opens a dropdown)
+    BoxLayout:
+        id: right_controls
+        size_hint: None, 1
+        width: "150dp"
+        spacing: "2dp"
+        padding: 0
+
+        Button:
+            id: hint_btn
+            text: ""
+            background_color: 0, 0, 0, 0
+            size_hint: None, 1
+            width: "48dp"
+            on_release: hint_dropdown.open(self)
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, 0) if self.state == "normal" else (1, 1, 1, 0.15)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [8]
+            BoxLayout:
+                size: self.parent.size
+                pos: self.parent.pos
+                Image:
+                    source: 'images/icons/lightbulb-glowing.png'
+                    size_hint: .8, .8
+                    pos_hint: {'center_y': .5}
+                    fit_mode: 'contain'
+
+        DropDown:
+            id: hint_dropdown
+            auto_dismiss: True
+            auto_width: False
+            size_hint_x: None
+            width: "220dp"
+            on_parent: self.width = right_controls.width if right_controls else self.width
+            # args[1] is the selected value
+            on_select: root.parent.parent.on_hint_selected(args[1])
+            Button:
+                text: 'Show Hint'
+                size_hint_y: None
+                size_hint_x: None
+                width: hint_dropdown.width
+                height: '40dp'
+                background_normal: ''
+                background_color: 1, 1, 1, 1
+                color: 0, 0, 0, 1
+                canvas.after:
+                    Color:
+                        rgba: (0.85, 0.85, 0.85, 1)
+                    Line:
+                        rectangle: (self.x + 0.5, self.y + 0.5, self.width - 1, self.height - 1)
+                        width: 1
+                on_release: root.select(self.text)
+            Button:
+                text: 'Reveal Cell'
+                size_hint_y: None
+                size_hint_x: None
+                width: hint_dropdown.width
+                height: '40dp'
+                background_normal: ''
+                background_color: 1, 1, 1, 1
+                color: 0, 0, 0, 1
+                canvas.after:
+                    Color:
+                        rgba: (0.85, 0.85, 0.85, 1)
+                    Line:
+                        rectangle: (self.x + 0.5, self.y + 0.5, self.width - 1, self.height - 1)
+                        width: 1
+                on_release: root.select(self.text)
+            Button:
+                text: 'Reveal Puzzle'
+                size_hint_y: None
+                size_hint_x: None
+                width: hint_dropdown.width
+                height: '40dp'
+                background_normal: ''
+                background_color: 1, 1, 1, 1
+                color: 0, 0, 0, 1
+                canvas.after:
+                    Color:
+                        rgba: (0.85, 0.85, 0.85, 1)
+                    Line:
+                        rectangle: (self.x + 0.5, self.y + 0.5, self.width - 1, self.height - 1)
+                        width: 1
+                on_release: root.select(self.text)
+            Button:
+                text: 'Check Puzzle'
+                size_hint_y: None
+                size_hint_x: None
+                width: hint_dropdown.width
+                height: '40dp'
+                background_normal: ''
+                background_color: 1, 1, 1, 1
+                color: 0, 0, 0, 1
+                canvas.after:
+                    Color:
+                        rgba: (0.85, 0.85, 0.85, 1)
+                    Line:
+                        rectangle: (self.x + 0.5, self.y + 0.5, self.width - 1, self.height - 1)
+                        width: 1
+                on_release: root.select(self.text)
+
+        Button:
+            text: ""
+            background_color: 0, 0, 0, 0
+            size_hint: None, 1
+            width: "48dp"
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, 0) if self.state == "normal" else (1, 1, 1, 0.15)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [8]
+            BoxLayout:
+                size: self.parent.size
+                pos: self.parent.pos
+                Image:
+                    source: 'images/icons/gear.png'
+                    size_hint: .8, .8
+                    pos_hint: {'center_y': .5}
+                    fit_mode: 'contain'
+
+        Button:
+            text: ""
+            background_color: 0, 0, 0, 0
+            size_hint: None, 1
+            width: "48dp"
+            canvas.before:
+                Color:
+                    rgba: (1, 1, 1, 0) if self.state == "normal" else (1, 1, 1, 0.15)
+                RoundedRectangle:
+                    size: self.size
+                    pos: self.pos
+                    radius: [8]
+            BoxLayout:
+                size: self.parent.size
+                pos: self.parent.pos
+                Image:
+                    source: 'images/icons/question-mark.png'
+                    size_hint: .8, .8
+                    pos_hint: {'center_y': .5}
+                    fit_mode: 'contain'
 
 <Cell>:
     background_color: 0, 0, 0, 0
@@ -98,30 +239,30 @@ MainWidget:
     background_color: 0, 0, 0, 0
     background_normal: ''
     bold: True
-    font_size: min(self.width, self.height) * 0.5
+    font_size: min(self.width, self.height) * 0.75
     color: (0.3, 0.3, 0.3, 1)
     canvas.before:
         Color:
-            rgba: (1, 1, 1, 1) if self.state == "normal" else (.5, .8, 1, 1)
+            rgba: (1, 1, 1, 1) if self.state == "normal" else (.9, .9, .9, 1)
         RoundedRectangle:
             size: self.size
             pos: self.pos
             radius: [8]
         Color:
-            rgba: (0.85, 0.85, 0.85, 1) if self.state == "normal" else (.4, .7, .95, 1)
+            rgba: (0.85, 0.85, 0.85, 1) if self.state == "normal" else (.7, .7, .7, 1)
         Line:
             rounded_rectangle: (self.x, self.y, self.width, self.height, 8)
-            width: 1.5
+            width: 1.2
 
 <NumPadControlButton>:
     background_color: 0, 0, 0, 0
     background_normal: ''
     bold: True
-    font_size: "18sp"
+    font_size: min(self.width, self.height) * 0.6
     color: (1, 1, 1, 1)
     canvas.before:
         Color:
-            rgba: (0.9, 0.4, 0.4, 1) if self.state == "normal" else (0.95, 0.5, 0.5, 1)
+            rgba: (0.5, 0.5, 0.5, 1) if self.state == "normal" else (.4, .4, .4, 1)
         RoundedRectangle:
             size: self.size
             pos: self.pos
@@ -168,32 +309,43 @@ MainWidget:
     BoxLayout:
         orientation: "horizontal"
         spacing: "8dp"
-        size_hint: 1, None
-        height: "50dp"
+        size_hint: 1, .25
         NumPadControlButton:
             text: "Delete"
             on_press: root.parent.parent.on_delete_click(self)
         NumPadControlButton:
             text: "Clear"
             on_press: root.parent.parent.on_clear_click(self)
+        NumPadControlButton:
+            AnchorLayout:
+                # Fill the button and center children
+                size: self.parent.size
+                pos: self.parent.pos
+                anchor_x: 'center'
+                anchor_y: 'center'
+                Image:
+                    source: 'images/icons/pencil.png'
+                    size_hint: None, None
+                    size: dp(24), dp(24)
+                    fit_mode: 'contain'
 
 <SudokuBox>:
     rows: 3
     spacing: "2dp"
     canvas.before:
         Color:
-            rgba: (0.7, 0.7, 0.7, 1)
+            rgba: (0.8, 0.8, 0.8, 1)
         Rectangle:
             size: self.size
             pos: self.pos
 
 <SudokuGrid>:
     rows: 3
-    padding: "4dp"
-    spacing: "4dp"
+    #padding: "3dp"
+    spacing: "3dp"
     canvas.before:
         Color:
-            rgba: (0, 0, 0, 1)
+            rgba: (0.6, 0.6, 0.6, 1)
         Rectangle:
             size: self.size
             pos: self.pos
@@ -204,5 +356,12 @@ MainWidget:
         size_hint: None, None
         size: min(root.width - 20, root.height - 20), min(root.width - 20, root.height - 20)
         pos_hint: {"center_x": 0.5, "center_y": 0.5}
+        padding: "4dp"
+        canvas.before:
+            Color:
+                rgba: (0, 0, 0, 1)
+            Rectangle:
+                size: self.size
+                pos: self.pos
         SudokuGrid:
             size_hint: 1, 1

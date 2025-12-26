@@ -1,143 +1,119 @@
 
 <MenuWidget>:
-    canvas.before:
-        # Primary background: white
-        Color:
-            rgba: (1, 1, 1, 1)
-        Rectangle:
-            size: self.size
-            pos: self.pos
-
     BoxLayout:
-        orientation: "vertical"
-        padding: "24dp"
-        spacing: "16dp"
+        size_hint: None, None
+        size: root.width, root.height
+        orientation: 'vertical'
+        spacing: '12dp'
+        padding: '12dp'
+        canvas.before:
+            # Light-blue card background for a subtle accent
+            Color:
+                rgba: (0.97, 0.99, 1, 1)
+            Rectangle:
+                size: self.size
+                pos: self.pos
 
-        Widget:
-            size_hint: 1, 0.03
+        Image:
+            id: puzzle_image
+            source: 'images/icons/sudoku.png'
+            size_hint: 1, 0.68
+            fit_mode: 'contain'
 
         AnchorLayout:
-            size_hint_y: 0.62
+            size_hint_y: 0.4
             anchor_x: 'center'
-            anchor_y: 'top'
+            anchor_y: 'center'
 
             BoxLayout:
                 size_hint: None, None
-                size: min(root.width * 0.82, dp(440)), min(root.height * 0.62, dp(440))
                 orientation: 'vertical'
-                spacing: '12dp'
-                padding: '12dp'
-                canvas.before:
-                    # Light-blue card background for a subtle accent
-                    Color:
-                        rgba: (0.97, 0.99, 1, 1)
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos
+                spacing: '10dp'
+                height: '188dp'
+                # width based on the widest button's text (texture width) + padding
+                width: 
+                    max(root.ids.play_btn.texture_size[0] if 'play_btn' in root.ids else 0, \
+                    root.ids.camera_btn.texture_size[0] if 'camera_btn' in root.ids else 0, \
+                    root.ids.library_btn.texture_size[0] if 'library_btn' in root.ids else 0) + dp(48)
 
-                Image:
-                    id: puzzle_image
-                    source: 'images/sudoku.png'
-                    size_hint: 1, 0.68
-                    allow_stretch: True
-                    keep_ratio: True
+                Button:
+                    id: play_btn
+                    text: "Play Sudoku"
+                    font_size: "22sp"
+                    bold: True
+                    background_normal: ''
+                    background_color: (0, 0, 0, 0)
+                    color: (1, 1, 1, 1)
+                    size_hint: None, None
+                    width: self.parent.width
+                    height: "56dp"
+                    on_press: root.manager.current = "puzzle"
+                    canvas.before:
+                        Color:
+                            rgba: (0.2, 0.6, 0.9, 1)
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [12,]
 
-                BoxLayout:
-                    orientation: 'vertical'
-                    size_hint_y: 0.32
-                    spacing: '10dp'
-                    padding: [0, '12dp', 0, 0]
+                Button:
+                    id: camera_btn
+                    text: ''                       # clear default text so the inner Label is used
+                    font_size: "22sp"
+                    bold: True
+                    background_normal: ''
+                    background_color: (0, 0, 0, 0)
+                    color: (1, 1, 1, 1)
+                    size_hint: None, None
+                    width: self.parent.width
+                    height: "48dp"
+                    on_press: root.manager.current = "scanner"
 
-                    # small spacer to push buttons a little further down
-                    Widget:
-                        size_hint_y: None
-                        height: '6dp'
+                    canvas.before:
+                        Color:
+                            rgba: (0.2, 0.6, 0.9, 1)
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [10,]
 
                     BoxLayout:
+                        # Ensure the box fills the button so children are positioned inside
+                        size: self.parent.size
+                        pos: self.parent.pos
                         orientation: 'horizontal'
-                        size_hint_y: None
-                        height: self.minimum_height
-                        padding: '24dp', 0
+                        padding: dp(26), 0, dp(12), 0
+                        spacing: dp(10)
+                        Image:
+                            source: 'images/icons/camera.png'
+                            size_hint: .3, .8
+                            pos_hint: {'center_y': .47}
+                            fit_mode: 'contain'
+                        Label:
+                            text: 'Camera'
+                            color: 1, 1, 1, 1
+                            font_size: '22sp'
+                            bold: True
+                            halign: 'left'
+                            valign: 'middle'
+                            text_size: self.size
 
-                        Widget:
-                            size_hint_x: 1
-
-                        AnchorLayout:
-                            size_hint_x: None
-                            anchor_x: 'center'
-                            anchor_y: 'center'
-                            # width based on the widest button's text (texture width) + padding
-                            width: max(root.ids.play_btn.texture_size[0] if 'play_btn' in root.ids else 0, root.ids.camera_btn.texture_size[0] if 'camera_btn' in root.ids else 0, root.ids.library_btn.texture_size[0] if 'library_btn' in root.ids else 0) + dp(48)
-
-                            BoxLayout:
-                                orientation: 'vertical'
-                                size_hint: None, None
-                                width: self.parent.width
-                                height: self.minimum_height
-                                spacing: '10dp'
-
-                                Button:
-                                    id: play_btn
-                                    text: "Play Sudoku"
-                                    font_size: "22sp"
-                                    bold: True
-                                    background_normal: ''
-                                    background_color: (0, 0, 0, 0)
-                                    color: (1, 1, 1, 1)
-                                    size_hint: None, None
-                                    width: self.parent.width
-                                    height: "56dp"
-                                    on_press: root.manager.current = "puzzle"
-                                    canvas.before:
-                                        Color:
-                                            rgba: (0.2, 0.6, 0.9, 1)
-                                        RoundedRectangle:
-                                            pos: self.pos
-                                            size: self.size
-                                            radius: [12,]
-
-                                Button:
-                                    id: camera_btn
-                                    text: "📷  Camera"
-                                    font_size: "22sp"
-                                    bold: True
-                                    background_normal: ''
-                                    background_color: (0, 0, 0, 0)
-                                    color: (1, 1, 1, 1)
-                                    size_hint: None, None
-                                    width: self.parent.width
-                                    height: "48dp"
-                                    on_press: root.manager.current = "scanner"
-                                    canvas.before:
-                                        Color:
-                                            rgba: (0.2, 0.6, 0.9, 1)
-                                        RoundedRectangle:
-                                            pos: self.pos
-                                            size: self.size
-                                            radius: [10,]
-
-                                Button:
-                                    id: library_btn
-                                    text: "Puzzle library"
-                                    font_size: "22sp"
-                                    bold: True
-                                    background_normal: ''
-                                    background_color: (0, 0, 0, 0)
-                                    color: (1, 1, 1, 1)
-                                    size_hint: None, None
-                                    width: self.parent.width
-                                    height: "48dp"
-                                    on_press: root.manager.current = "library"
-                                    canvas.before:
-                                        Color:
-                                            rgba: (0.2, 0.6, 0.9, 1)
-                                        RoundedRectangle:
-                                            pos: self.pos
-                                            size: self.size
-                                            radius: [10,]
-
-                        Widget:
-                            size_hint_x: 1
-
-        Widget:
-            size_hint: 1, 0.05
+                Button:
+                    id: library_btn
+                    text: "Puzzle library"
+                    font_size: "22sp"
+                    bold: True
+                    background_normal: ''
+                    background_color: (0, 0, 0, 0)
+                    color: (1, 1, 1, 1)
+                    size_hint: None, None
+                    width: self.parent.width
+                    height: "48dp"
+                    on_press: root.manager.current = "library"
+                    canvas.before:
+                        Color:
+                            rgba: (0.2, 0.6, 0.9, 1)
+                        RoundedRectangle:
+                            pos: self.pos
+                            size: self.size
+                            radius: [10,]
