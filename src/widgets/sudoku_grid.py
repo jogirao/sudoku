@@ -51,12 +51,12 @@ class SudokuGrid(GridLayout):
             self.clear_puzzle()
 
             with open(self.puzzle_file, "r") as f:
-                puzzle = ast.literal_eval(f.read())
+                puzzle = str(ast.literal_eval(f.read()))
 
             i = 0
             for box in self.children:
                 for cell in box.children:
-                    if puzzle[i] != 0:
+                    if puzzle[i] != "0":
                         cell.text = str(puzzle[i])
                         cell.color = (0, 0, 0, 1)  # Black color for fixed cells
                     i += 1

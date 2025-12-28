@@ -88,8 +88,7 @@ MainWidget:
             background_color: 0, 0, 0, 0
             size_hint: None, 1
             width: "48dp"
-            on_press: self._pressed = True
-            on_release: (hint_dropdown.open(self) if getattr(self, '_pressed', False) else None); self._pressed = False
+            on_release: hint_dropdown.open(self)
             canvas.before:
                 Color:
                     rgba: (1, 1, 1, 0) if self.state == "normal" else (1, 1, 1, 0.15)
@@ -149,6 +148,22 @@ MainWidget:
                 on_release: root.parent.on_hint_selected(self.text)
             Button:
                 text: 'Reveal Puzzle'
+                size_hint_y: None
+                size_hint_x: None
+                width: hint_dropdown.width
+                height: '40dp'
+                background_normal: ''
+                background_color: 1, 1, 1, 1
+                color: 0, 0, 0, 1
+                canvas.after:
+                    Color:
+                        rgba: (0.85, 0.85, 0.85, 1)
+                    Line:
+                        rectangle: (self.x + 0.5, self.y + 0.5, self.width - 1, self.height - 1)
+                        width: 1
+                on_release: root.parent.on_hint_selected(self.text)
+            Button:
+                text: 'Check Cell'
                 size_hint_y: None
                 size_hint_x: None
                 width: hint_dropdown.width

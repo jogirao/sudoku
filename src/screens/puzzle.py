@@ -61,6 +61,8 @@ class MainBoxLayout(BoxLayout):
             print("Reveal Cell selected (not implemented).")
         elif option == "Reveal Puzzle":
             print("Reveal Puzzle selected (not implemented).")
+        elif option == "Check Cell":
+            print("Check Cell selected (not implemented).")
         elif option == "Check Puzzle":
             print("Check Puzzle selected (not implemented).")
 
